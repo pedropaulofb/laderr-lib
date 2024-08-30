@@ -29,6 +29,7 @@ poetry = "^1.7.1"
 pre-commit = "^3.4.0"
 pytest = "^8.0.0"
 pytest-cov = "^5.0.0"
+loguru = "^0.7.2"
 # Sphynx and plugins
 sphinx = "^7.4.7"
 sphinx-autoapi = "^3.0.0"

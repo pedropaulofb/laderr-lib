@@ -21,7 +21,7 @@ def get_version_from_pyproject():
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "ontouml-models-lib"
+project = "laderr-lib"
 copyright = "Pedro Paulo F. Barcelos <p.p.favatobarcelos@utwente.nl>"
 author = "Pedro Paulo F. Barcelos <p.p.favatobarcelos@utwente.nl>"
 
@@ -44,9 +44,9 @@ extensions = [
 
 autodoc_typehints = "description"
 github_username = "pedropaulofb"
-github_repository = "ontouml/ontouml-models-lib"
+github_repository = "pedropaulofb/laderr-lib"
 
-autoapi_dirs = ["../ontouml_models_lib/"]
+autoapi_dirs = ["../laderr_lib/"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -56,7 +56,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_logo = "https://raw.githubusercontent.com/OntoUML/ontouml-models-lib/main/resources/ontouml-models-lib-logo.png"
+html_logo = "https://raw.githubusercontent.com/pedropaulofb/laderr-lib/main/resources/laderr-lib-logo.png"
 html_theme_options = {"display_version": True}
 
 sphinx_rtd_size_width = "100%"
