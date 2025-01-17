@@ -1,0 +1,7 @@
+title = "my spec"
+description = "specification"
+version = "1.0.0"
+
+[section1]
+key1 = "value1"
+key2 = 42
