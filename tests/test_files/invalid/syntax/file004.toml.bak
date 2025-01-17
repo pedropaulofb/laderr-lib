@@ -1,0 +1,4 @@
+# This case is not correctly handled by tomllib. It should be invalid, but it is not reported as so.
+createdBy = ["John Doe", 123]
+description = "This is valid"
+version = "1.0"

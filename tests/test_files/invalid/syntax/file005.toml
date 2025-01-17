@@ -1,0 +1,3 @@
+metadata = { title = "Laderr Example", version = "1.0"
+description = "This is valid"
+createdBy = ["John Doe", "Jane Smith"]

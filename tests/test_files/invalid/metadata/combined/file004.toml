@@ -1,0 +1,7 @@
+title = 12345  # Datatype problem: expected xsd:string
+description = "An example description"
+version = "1.0"
+createdBy = "John Doe"
+createdOn = "2023-10-10T12:00:00Z"
+baseURI = "https://example.com/laderr#"
+extraField = true  # Undefined field

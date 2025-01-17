@@ -1,0 +1,6 @@
+title = 12345                      # Invalid datatype: Should be xsd:string
+description = 789                  # Invalid datatype: Should be xsd:string
+version = false                    # Invalid datatype: Should be xsd:string
+createdBy = ["John Doe", 123]      # Invalid datatype: Should be xsd:string (second value is invalid)
+createdOn = "10/10/2023 12:00:00"  # Invalid datatype: Should be xsd:dateTime
+baseURI = "ftp://example.com"      # Invalid datatype: Should be xsd:anyURI (ftp is not allowed)

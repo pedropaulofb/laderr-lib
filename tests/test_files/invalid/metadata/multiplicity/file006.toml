@@ -1,0 +1,6 @@
+title = ["Value1", "Value2"]
+description = ["Value1", "Value2"]
+version = "1.0"
+createdBy = "John Doe"
+createdOn = "2023-10-10T12:00:00Z"
+baseURI = "https://example.com/laderr#"

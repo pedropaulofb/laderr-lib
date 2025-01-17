@@ -1,0 +1,6 @@
+title = "Example Title"
+description = "An example description"
+version = "1.0"
+createdBy = 12345
+createdOn = "2023-10-10T12:00:00Z"
+baseURI = "https://example.com/laderr#"
