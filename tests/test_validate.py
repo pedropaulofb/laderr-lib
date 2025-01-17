@@ -40,7 +40,7 @@ def test_validate_syntax_errors(file_path: str) -> None:
 
 
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/datatype"))
-def test_validate_metadata_datatype(file_path: str) -> None:
+def test_validate_metadata_invalid_datatype(file_path: str) -> None:
     """
     Tests that the `validate` method correctly identifies and reports metadata datatype errors.
 
@@ -56,36 +56,47 @@ def test_validate_metadata_datatype(file_path: str) -> None:
 
 
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/multiplicity"))
-def test_validate_metadata_multiplicity(file_path: str) -> None:
+def test_validate_metadata_invalid_multiplicity(file_path: str) -> None:
     """
     Tests that the validate method correctly identifies multiplicity errors in metadata.
 
     :param file_path: Path to the invalid TOML file with multiplicity issues.
     :type file_path: str
-    :raises AssertionError: If the validation does not raise the expected error.
+    :raises AssertionError: If the validation does not raise the expected value.
     """
     assert not Laderr.validate(file_path), f"Validation incorrectly passed for file: {file_path}"
 
 
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/undefined"))
-def test_validate_metadata_undefined(file_path: str) -> None:
+def test_validate_metadata_invalid_undefined(file_path: str) -> None:
     """
     Tests that the validate method correctly identifies undefined metadata keys.
 
     :param file_path: Path to the invalid TOML file with undefined metadata keys.
     :type file_path: str
-    :raises AssertionError: If the validation does not raise the expected error.
+    :raises AssertionError: If the validation does not raise the expected value.
     """
     assert not Laderr.validate(file_path), f"Validation incorrectly passed for file: {file_path}"
 
 
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/combined"))
-def test_validate_metadata_combined(file_path: str) -> None:
+def test_validate_metadata_invalid_combined(file_path: str) -> None:
     """
     Tests that the validate method correctly identifies combined metadata keys.
 
     :param file_path: Path to the invalid TOML file with combined metadata keys.
     :type file_path: str
-    :raises AssertionError: If the validation does not raise the expected error.
+    :raises AssertionError: If the validation does not raise the expected value.
     """
     assert not Laderr.validate(file_path), f"Validation incorrectly passed for file: {file_path}"
+
+@pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/valid"))
+def test_validate_metadata_valid(file_path: str) -> None:
+    """
+    Tests that the validate method correctly identifies valid metadata keys.
+
+    :param file_path: Path to the invalid TOML file with valid metadata keys.
+    :type file_path: str
+    :raises AssertionError: If the validation does not raise the expected value.
+    """
+    assert Laderr.validate(file_path), f"Validation incorrectly not passed for file: {file_path}"

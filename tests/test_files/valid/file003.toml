@@ -1,0 +1,6 @@
+title = "No Description Example"
+version = "1.1"
+createdBy = "Alice"
+createdOn = "2023-03-01T12:00:00Z"
+modifiedOn = "2023-03-10T12:00:00Z"
+baseURI = "https://example.org/laderr#"

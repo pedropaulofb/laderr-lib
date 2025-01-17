@@ -130,6 +130,7 @@ class Laderr:
         laderr_graph = Laderr._load_metadata(laderr_graph, metadata_dict)
         conforms, _, report_text = Laderr._validate_with_shacl(laderr_graph)
         Laderr._report_validation_result(conforms, report_text)
+        Laderr._save_graph(laderr_graph,"../result.ttl")
         return conforms
 
     def _write_specification(self):
@@ -255,6 +256,6 @@ class Laderr:
 if __name__ == "__main__":
 
     # Load metadata and data from the specification
-    laderr_file = r"/tests/test_files/invalid/syntax/file004.toml.bak"
+    laderr_file = "../resources/my_spec.toml"
 
     Laderr.validate(laderr_file)

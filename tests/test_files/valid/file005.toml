@@ -1,0 +1,7 @@
+title = "ISO-8601 Date Example"
+description = "Valid ISO-8601 dates for creation and modification."
+version = "1.2"
+createdBy = "John Smith"
+createdOn = "2023-05-01T12:00:00+01:00"
+modifiedOn = "2023-05-10T12:00:00+01:00"
+baseURI = "https://laderr.org/schema#"
