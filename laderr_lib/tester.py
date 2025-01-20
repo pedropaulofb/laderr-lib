@@ -7,5 +7,5 @@ if __name__ == "__main__":
     laderr_file = "resources/my_spec.toml"
 
 
-    ic(Laderr._read_specification(laderr_file))
-    # Laderr.validate(laderr_file)
+    # ic(Laderr._read_specification(laderr_file))
+    Laderr.validate(laderr_file)

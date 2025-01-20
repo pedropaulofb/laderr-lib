@@ -2,6 +2,7 @@ import os
 import tomllib
 from urllib.parse import urlparse
 
+from icecream import ic
 from loguru import logger
 from pyshacl import validate
 from rdflib import Graph, Namespace, RDF, Literal, XSD
@@ -167,13 +168,19 @@ class Laderr:
     def validate(cls, laderr_file_path: str):
 
         # syntactical validation
-        metadata_dict, data_dict = Laderr._read_specification(laderr_file_path)
+        spec_metadata_dict, spec_data_dict = Laderr._read_specification(laderr_file_path)
 
         # semantic validation
-        laderr_graph = Laderr._load_spec_metadata(metadata_dict)
-        conforms, _, report_text = Laderr._validate_with_shacl(laderr_graph)
+        spec_metadata_graph = Laderr._load_spec_metadata(spec_metadata_dict)
+        spec_data_graph = Laderr._load_spec_data(spec_metadata_dict, spec_data_dict)
+
+        unified_graph = Graph()
+        unified_graph += spec_metadata_graph
+        unified_graph += spec_data_graph
+
+        conforms, _, report_text = Laderr._validate_with_shacl(unified_graph)
         Laderr._report_validation_result(conforms, report_text)
-        Laderr._save_graph(laderr_graph, "../result.ttl")
+        Laderr._save_graph(unified_graph, "../result.ttl")
         return conforms
 
     @classmethod
