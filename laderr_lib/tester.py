@@ -3,7 +3,7 @@ from icecream import ic
 from laderr_lib.laderr import Laderr
 
 if __name__ == "__main__":
-    # Load metadata and data from the specification
+    # Load spec_metadata_dict and data from the specification
     laderr_file = "resources/my_spec.toml"
 
 

@@ -5,7 +5,7 @@ version = "1.0"
 createdBy = ["Alice", "Bob"]
 createdOn = "2025-01-17T12:00:00Z"
 modifiedOn = "2025-01-18T12:00:00Z"
-baseURI = "https://example123.com/laderr#"
+baseUri = "https://example123.com/laderr#"
 
 # Data Section
 [RiskEvent.a]

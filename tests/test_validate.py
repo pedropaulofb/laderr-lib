@@ -42,10 +42,10 @@ def test_validate_syntax_errors(file_path: str) -> None:
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/datatype"))
 def test_validate_metadata_invalid_datatype(file_path: str) -> None:
     """
-    Tests that the `validate` method correctly identifies and reports metadata datatype errors.
+    Tests that the `validate` method correctly identifies and reports spec_metadata_dict datatype errors.
 
     The test dynamically retrieves TOML files from the specified folder, where each file is expected
-    to contain invalid datatype metadata. The `validate` method should return `False` for these cases,
+    to contain invalid datatype spec_metadata_dict. The `validate` method should return `False` for these cases,
     indicating that the SHACL semantic validation has failed.
 
     :param file_path: Path to the invalid TOML file with datatype issues.
@@ -58,7 +58,7 @@ def test_validate_metadata_invalid_datatype(file_path: str) -> None:
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/multiplicity"))
 def test_validate_metadata_invalid_multiplicity(file_path: str) -> None:
     """
-    Tests that the validate method correctly identifies multiplicity errors in metadata.
+    Tests that the validate method correctly identifies multiplicity errors in spec_metadata_dict.
 
     :param file_path: Path to the invalid TOML file with multiplicity issues.
     :type file_path: str
@@ -70,9 +70,9 @@ def test_validate_metadata_invalid_multiplicity(file_path: str) -> None:
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/undefined"))
 def test_validate_metadata_invalid_undefined(file_path: str) -> None:
     """
-    Tests that the validate method correctly identifies undefined metadata keys.
+    Tests that the validate method correctly identifies undefined spec_metadata_dict keys.
 
-    :param file_path: Path to the invalid TOML file with undefined metadata keys.
+    :param file_path: Path to the invalid TOML file with undefined spec_metadata_dict keys.
     :type file_path: str
     :raises AssertionError: If the validation does not raise the expected value.
     """
@@ -82,9 +82,9 @@ def test_validate_metadata_invalid_undefined(file_path: str) -> None:
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/invalid/metadata/combined"))
 def test_validate_metadata_invalid_combined(file_path: str) -> None:
     """
-    Tests that the validate method correctly identifies combined metadata keys.
+    Tests that the validate method correctly identifies combined spec_metadata_dict keys.
 
-    :param file_path: Path to the invalid TOML file with combined metadata keys.
+    :param file_path: Path to the invalid TOML file with combined spec_metadata_dict keys.
     :type file_path: str
     :raises AssertionError: If the validation does not raise the expected value.
     """
@@ -93,9 +93,9 @@ def test_validate_metadata_invalid_combined(file_path: str) -> None:
 @pytest.mark.parametrize("file_path", generate_test_cases_from_folder("test_files/valid"))
 def test_validate_metadata_valid(file_path: str) -> None:
     """
-    Tests that the validate method correctly identifies valid metadata keys.
+    Tests that the validate method correctly identifies valid spec_metadata_dict keys.
 
-    :param file_path: Path to the invalid TOML file with valid metadata keys.
+    :param file_path: Path to the invalid TOML file with valid spec_metadata_dict keys.
     :type file_path: str
     :raises AssertionError: If the validation does not raise the expected value.
     """

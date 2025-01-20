@@ -21,21 +21,23 @@ class Laderr:
     LADER_NS = Namespace("https://w3id.org/pedropaulofb/laderr#")
 
     @classmethod
-    def _validate_base_uri(cls, metadata: dict[str, object]) -> str:
+    def _validate_base_uri(cls, spec_metadata_dict: dict[str, object]) -> str:
         """
         Validates the base URI provided in the metadata dictionary. If the base URI is invalid or missing,
         a default value of "https://laderr.laderr#" is returned.
 
-        :param metadata: Metadata dictionary.
-        :type metadata: Dict[str, object]
+        :param spec_metadata_dict: Metadata dictionary.
+        :type spec_metadata_dict: Dict[str, object]
         :return: A valid base URI.
         :rtype: str
         """
-        base_uri = metadata.get("base_uri", "https://laderr.laderr#")
-
+        ic(spec_metadata_dict)
+        base_uri = spec_metadata_dict.get("baseUri", "https://laderr.laderr#")
+        ic(base_uri)
         # Check if base_uri is a valid URI
         parsed = urlparse(base_uri)
         if not all([parsed.scheme, parsed.netloc]):
+            ic("here")
             logger.warning(f"Invalid base URI '{base_uri}' provided. Using default 'https://laderr.laderr#'.")
 
         return base_uri
@@ -43,7 +45,7 @@ class Laderr:
     @classmethod
     def _load_spec_data(cls, spec_metadata: dict[str, object], spec_data: dict[str, object]) -> Graph:
         """
-        Loads the data section from the specification into an RDFLib graph.
+        Loads the data section from the specification into an RDFLib graph and adds the `composedOf` relationship.
 
         If the `id` property is not explicitly defined within a section, the id is automatically set to the section's
         key name (e.g., "X" from [RiskEvent.X]).
@@ -54,16 +56,22 @@ class Laderr:
         :type spec_metadata: dict[str, object]
         :param spec_data: Dictionary representing the `data` section of the specification.
         :type spec_data: dict[str, object]
-        :return: RDFLib graph containing the data.
+        :return: RDFLib graph containing the data and `composedOf` relationship.
         :rtype: Graph
         """
         # Initialize an empty graph
         graph = Graph()
 
-        # Get the base URI from metadata (use default if not defined)
+        # Get the base URI from spec_metadata_dict and bind namespaces
         base_uri = cls._validate_base_uri(spec_metadata)
         data_ns = Namespace(base_uri)
-        graph.bind("", data_ns)  # Use "" for the default namespace
+        laderr_ns = cls.LADER_NS
+        graph.bind("", data_ns)  # Bind the `:` namespace
+        graph.bind("laderr", laderr_ns)  # Bind the `laderr:` namespace
+
+        # Create or identify the single RiskSpecification instance
+        specification_uri = data_ns.LaderrSpecification
+        graph.add((specification_uri, RDF.type, laderr_ns.LaderrSpecification))
 
         # Iterate over the sections in the data
         for class_type, instances in spec_data.items():
@@ -73,14 +81,15 @@ class Laderr:
             for key, properties in instances.items():
                 if not isinstance(properties, dict):
                     raise ValueError(
-                        f"Invalid structure for instance '{key}' in '{class_type}'. Expected a dictionary of properties.")
+                        f"Invalid structure for instance '{key}' in '{class_type}'. Expected a dictionary of properties."
+                    )
 
                 # Determine the `id` of the instance (default to section key if not explicitly set)
                 instance_id = properties.get("id", key)
 
                 # Create the RDF node for the instance
                 instance_uri = data_ns[instance_id]
-                graph.add((instance_uri, RDF.type, cls.LADER_NS[class_type]))
+                graph.add((instance_uri, RDF.type, laderr_ns[class_type]))
 
                 # Add properties to the instance
                 for prop, value in properties.items():
@@ -90,45 +99,53 @@ class Laderr:
                     # Add properties to the graph
                     if isinstance(value, list):
                         for item in value:
-                            graph.add((instance_uri, cls.LADER_NS[prop], Literal(item)))
+                            graph.add((instance_uri, laderr_ns[prop], Literal(item)))
                     else:
-                        graph.add((instance_uri, cls.LADER_NS[prop], Literal(value)))
+                        graph.add((instance_uri, laderr_ns[prop], Literal(value)))
+
+                # Add the composedOf relationship
+                graph.add((specification_uri, laderr_ns.composedOf, instance_uri))
 
         return graph
 
     @classmethod
     def _load_spec_metadata(cls, metadata: dict[str, object]) -> Graph:
         """
-        Creates an RDF graph containing only the provided metadata.
-
-        Handles cases where metadata values are lists (e.g., `createdBy`), adding each list element as a separate triple.
-        Also ensures that values are correctly typed according to SHACL expectations.
+        Creates an RDF graph containing only the provided spec_metadata_dict.
 
         :param metadata: Metadata dictionary to add to the graph.
         :type metadata: dict[str, object]
-        :return: A new RDFLib graph containing only the metadata.
+        :return: A new RDFLib graph containing only the spec_metadata_dict.
         :rtype: Graph
         """
-        # Define expected datatypes for metadata keys
-        expected_datatypes = {"title": XSD.string, "description": XSD.string, "version": XSD.string,
-                              "createdBy": XSD.string, "createdOn": XSD.dateTime, "modifiedOn": XSD.dateTime,
-                              "baseURI": XSD.anyURI, }
+        # Define expected datatypes for spec_metadata_dict keys
+        expected_datatypes = {
+            "title": XSD.string,
+            "description": XSD.string,
+            "version": XSD.string,
+            "createdBy": XSD.string,
+            "createdOn": XSD.dateTime,
+            "modifiedOn": XSD.dateTime,
+            "baseURI": XSD.anyURI,
+        }
 
-        # Validate base URI and bind namespace for data with ":" prefix
+        # Validate base URI and bind namespaces
         base_uri = cls._validate_base_uri(metadata)
         data_ns = Namespace(base_uri)
+        laderr_ns = cls.LADER_NS
 
         # Create a new graph
         graph = Graph()
-        graph.bind("", data_ns)  # Use "" for the ":" prefix
+        graph.bind("", data_ns)  # Bind the `:` namespace
+        graph.bind("laderr", laderr_ns)  # Bind the `laderr:` namespace
 
-        # Create or identify LaderrSpecification instance in the data namespace
+        # Create or identify LaderrSpecification instance
         specification = data_ns.LaderrSpecification
-        graph.add((specification, RDF.type, cls.LADER_NS.LaderrSpecification))  # Reference schema from laderr namespace
+        graph.add((specification, RDF.type, laderr_ns.LaderrSpecification))
 
-        # Add metadata as properties of the specification
+        # Add spec_metadata_dict as properties of the specification
         for key, value in metadata.items():
-            property_uri = cls.LADER_NS[key]  # Schema properties come from laderr namespace
+            property_uri = laderr_ns[key]  # Schema properties come from laderr namespace
             datatype = expected_datatypes.get(key, XSD.string)  # Default to xsd:string if not specified
 
             # Handle lists
@@ -166,21 +183,28 @@ class Laderr:
 
     @classmethod
     def validate(cls, laderr_file_path: str):
-
-        # syntactical validation
+        # Syntactical validation
         spec_metadata_dict, spec_data_dict = Laderr._read_specification(laderr_file_path)
 
-        # semantic validation
+        # Semantic validation
         spec_metadata_graph = Laderr._load_spec_metadata(spec_metadata_dict)
         spec_data_graph = Laderr._load_spec_data(spec_metadata_dict, spec_data_dict)
 
+        # Combine graphs
         unified_graph = Graph()
         unified_graph += spec_metadata_graph
         unified_graph += spec_data_graph
 
+        # Bind namespaces in the unified graph
+        base_uri = cls._validate_base_uri(spec_metadata_dict)
+        unified_graph.bind("", Namespace(base_uri))  # Bind `:` to the base URI
+        unified_graph.bind("laderr", cls.LADER_NS)  # Bind `laderr:` to the schema namespace
+
+        ic(len(spec_metadata_graph), len(spec_data_graph), len(unified_graph))
+
         conforms, _, report_text = Laderr._validate_with_shacl(unified_graph)
         Laderr._report_validation_result(conforms, report_text)
-        Laderr._save_graph(unified_graph, "../result.ttl")
+        Laderr._save_graph(unified_graph, "./result.ttl")
         return conforms
 
     @classmethod
@@ -210,16 +234,16 @@ class Laderr:
     @classmethod
     def _read_specification(cls, laderr_file_path: str) -> tuple[dict[str, object], dict[str, object]]:
         """
-        Reads a TOML file, parses its content into a Python dictionary, and extracts preamble keys into a `metadata` dict.
+        Reads a TOML file, parses its content into a Python dictionary, and extracts preamble keys into a `spec_metadata_dict` dict.
 
         This function uses Python's built-in `tomllib` library to parse TOML files. The file must be passed as a binary
         stream, as required by `tomllib`. It processes the top-level keys that are not part of any section (preamble) and
-        stores them in a separate `metadata` dictionary. Handles cases where `createdBy` is a string or a list of strings.
+        stores them in a separate `spec_metadata_dict` dictionary. Handles cases where `createdBy` is a string or a list of strings.
 
         :param laderr_file_path: The path to the TOML file to be read.
         :type laderr_file_path: str
         :return: A tuple containing:
-            - `metadata`: A dictionary with preamble keys and their values.
+            - `spec_metadata_dict`: A dictionary with preamble keys and their values.
             - `data`: A dictionary with the remaining TOML data (sections and their contents).
         :rtype: tuple[dict[str, object], dict[str, object]]
         :raises FileNotFoundError: If the specified file does not exist or cannot be found.
@@ -229,7 +253,7 @@ class Laderr:
             with open(laderr_file_path, "rb") as file:
                 data: dict[str, object] = tomllib.load(file)
 
-            # Separate metadata and data
+            # Separate spec_metadata_dict and data
             spec_metadata = {key: value for key, value in data.items() if not isinstance(value, dict)}
             spec_data = {key: value for key, value in data.items() if isinstance(value, dict)}
 

@@ -1,14 +1,28 @@
-@prefix : <https://laderr.laderr#> .
-@prefix ns1: <https://w3id.org/pedropaulofb/laderr#> .
+@prefix : <https://example123.com/laderr#> .
+@prefix laderr: <https://w3id.org/pedropaulofb/laderr#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-:LaderrSpecification a ns1:LaderrSpecification ;
-    ns1:baseURI "https://longstrings.example.com/laderr#"^^xsd:anyURI ;
-    ns1:createdBy "Jane Doe"^^xsd:string ;
-    ns1:createdOn "2023-07-01T12:00:00+00:00"^^xsd:dateTime ;
-    ns1:description """This description spans multiple lines in the TOML file.
-It is valid as a long string and adheres to the constraints.
-"""^^xsd:string ;
-    ns1:title "Long Strings Example"^^xsd:string ;
-    ns1:version "4.0"^^xsd:string .
+:LaderrSpecification a laderr:LaderrSpecification ;
+    laderr:baseUri "https://example123.com/laderr#"^^xsd:string ;
+    laderr:composedOf :a,
+        :b1,
+        :c ;
+    laderr:createdBy "Alice"^^xsd:string,
+        "Bob"^^xsd:string ;
+    laderr:createdOn "2025-01-17T12:00:00+00:00"^^xsd:dateTime ;
+    laderr:description "This is an example specification for LaDeRR."^^xsd:string ;
+    laderr:modifiedOn "2025-01-18T12:00:00+00:00"^^xsd:dateTime ;
+    laderr:title "Example LaDeRR Specification"^^xsd:string ;
+    laderr:version "1.0"^^xsd:string .
+
+:a a laderr:RiskEvent ;
+    laderr:description "A risk event example." ;
+    laderr:name "Test Risk Event" .
+
+:b1 a laderr:Object ;
+    laderr:description "An object involved in the risk." ;
+    laderr:name "Test Object" .
+
+:c a laderr:Disposition ;
+    laderr:description "A disposition example." .
 
