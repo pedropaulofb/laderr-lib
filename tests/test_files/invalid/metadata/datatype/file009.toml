@@ -1,6 +1,6 @@
 title = 12345                      # Invalid datatype: Should be xsd:string
 description = 789                  # Invalid datatype: Should be xsd:string
 createdOn = "10-10-2023 12:00:00"  # Invalid datatype: Should be xsd:dateTime
-baseURI = "example.com/laderr#"    # Invalid datatype: Should be xsd:anyURI
+baseUri = "example.com/laderr#"    # Invalid datatype: Should be xsd:anyURI
 version = "1.0"
 createdBy = "John Doe"

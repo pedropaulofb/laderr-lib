@@ -9,12 +9,12 @@ baseUri = "https://example123.com/laderr#"
 
 # Data Section
 [RiskEvent.a]
-name = "Test Risk Event"
+label = "Test Risk Event"
 description = "A risk event example."
 
 [Object.b]
 id = "b1"
-name = "Test Object"
+label = "Test Object"
 description = "An object involved in the risk."
 
 [Disposition.c]

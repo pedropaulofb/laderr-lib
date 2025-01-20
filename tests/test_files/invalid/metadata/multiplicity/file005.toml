@@ -3,4 +3,4 @@ description = "An example description"
 version = "1.0"
 createdBy = "John Doe"
 createdOn = "2023-10-10T12:00:00Z"
-baseURI = ["https://example1.com", "https://example2.com"]
+baseUri = ["https://example1.com", "https://example2.com"]

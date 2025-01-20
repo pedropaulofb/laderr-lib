@@ -3,6 +3,6 @@ description = ["An example description", "Another description"]  # Multiplicity 
 version = 3.14  # Datatype problem: expected xsd:string
 createdBy = "John Doe"
 createdOn = "InvalidDate"  # Datatype problem: expected xsd:dateTime
-baseURI = "https://example.com/laderr#"
+baseUri = "https://example.com/laderr#"
 undefinedKey1 = "Not allowed"  # Undefined field
 undefinedKey2 = 42  # Undefined field

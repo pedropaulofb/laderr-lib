@@ -3,4 +3,4 @@ description = [123, "Another Description"] # Invalid datatype for first value (x
 version = 3.14                           # Invalid datatype (xsd:string expected)
 createdBy = ["John Doe", "Jane Doe"]     # Multiple values (maxCount 1)
 createdOn = "10/10/2023 12:00:00"        # Invalid datatype (xsd:dateTime expected)
-baseURI = ["https://example.com/laderr#", "https://extra.com/laderr#"] # Multiple values (maxCount 1)
+baseUri = ["https://example.com/laderr#", "https://extra.com/laderr#"] # Multiple values (maxCount 1)

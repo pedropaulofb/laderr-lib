@@ -4,4 +4,4 @@ version = "2.0"
 createdBy = ["John Doe", "Jane Smith"]
 createdOn = "2023-02-01T12:00:00Z"
 modifiedOn = "2023-02-15T12:00:00Z"
-baseURI = "https://example.com/laderr#"
+baseUri = "https://example.com/laderr#"

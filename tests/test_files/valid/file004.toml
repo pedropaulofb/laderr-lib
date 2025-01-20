@@ -3,4 +3,4 @@ description = "An example with a complex base URI."
 version = "3.0"
 createdBy = ["Alice", "Bob"]
 createdOn = "2023-04-01T12:00:00Z"
-baseURI = "https://subdomain.example.com/laderr/resource#"
+baseUri = "https://subdomain.example.com/laderr/resource#"

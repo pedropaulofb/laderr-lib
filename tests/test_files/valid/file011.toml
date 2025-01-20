@@ -6,4 +6,4 @@ It is valid as a long string and adheres to the constraints.
 version = "4.0"
 createdBy = "Jane Doe"
 createdOn = "2023-07-01T12:00:00Z"
-baseURI = "https://longstrings.example.com/laderr#"
+baseUri = "https://longstrings.example.com/laderr#"

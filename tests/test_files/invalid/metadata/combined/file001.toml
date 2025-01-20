@@ -3,4 +3,4 @@ description = 789                     # Invalid datatype (xsd:string expected)
 createdOn = "2023-10-10T12:00:00Z"    # Valid
 version = ["1.0", "2.0"]              # Multiple values (maxCount 1)
 createdBy = "John Doe"                # Valid
-baseURI = "https://example.com/laderr#"
+baseUri = "https://example.com/laderr#"

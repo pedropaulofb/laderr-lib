@@ -1,9 +1,10 @@
 @prefix : <https://example123.com/laderr#> .
 @prefix laderr: <https://w3id.org/pedropaulofb/laderr#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 :LaderrSpecification a laderr:LaderrSpecification ;
-    laderr:baseUri "https://example123.com/laderr#"^^xsd:string ;
+    laderr:baseUri "https://example123.com/laderr#"^^xsd:anyURI ;
     laderr:composedOf :a,
         :b1,
         :c ;
@@ -16,12 +17,12 @@
     laderr:version "1.0"^^xsd:string .
 
 :a a laderr:RiskEvent ;
-    laderr:description "A risk event example." ;
-    laderr:name "Test Risk Event" .
+    rdfs:label "Test Risk Event" ;
+    laderr:description "A risk event example." .
 
 :b1 a laderr:Object ;
-    laderr:description "An object involved in the risk." ;
-    laderr:name "Test Object" .
+    rdfs:label "Test Object" ;
+    laderr:description "An object involved in the risk." .
 
 :c a laderr:Disposition ;
     laderr:description "A disposition example." .

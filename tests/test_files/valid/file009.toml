@@ -3,4 +3,4 @@ description = "Authors can have long names or titles."
 version = "5.0"
 createdBy = ["Dr. John Doe, PhD", "Prof. Jane Smith, MD"]
 createdOn = "2023-09-01T12:00:00Z"
-baseURI = "https://complexauthors.example/laderr#"
+baseUri = "https://complexauthors.example/laderr#"

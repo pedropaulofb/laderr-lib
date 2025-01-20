@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from icecream import ic
 from loguru import logger
 from pyshacl import validate
-from rdflib import Graph, Namespace, RDF, Literal, XSD
+from rdflib import Graph, Namespace, RDF, Literal, XSD, RDFS
 from rdflib.exceptions import ParserError
 
 
@@ -31,9 +31,7 @@ class Laderr:
         :return: A valid base URI.
         :rtype: str
         """
-        ic(spec_metadata_dict)
         base_uri = spec_metadata_dict.get("baseUri", "https://laderr.laderr#")
-        ic(base_uri)
         # Check if base_uri is a valid URI
         parsed = urlparse(base_uri)
         if not all([parsed.scheme, parsed.netloc]):
@@ -96,12 +94,16 @@ class Laderr:
                     if prop == "id":
                         continue  # Skip `id`, it's already used for the URI
 
-                    # Add properties to the graph
-                    if isinstance(value, list):
-                        for item in value:
-                            graph.add((instance_uri, laderr_ns[prop], Literal(item)))
+                    if prop == "label":
+                        # Map 'label' to 'rdfs:label'
+                        graph.add((instance_uri, RDFS.label, Literal(value)))
                     else:
-                        graph.add((instance_uri, laderr_ns[prop], Literal(value)))
+                        # Map other properties to laderr namespace
+                        if isinstance(value, list):
+                            for item in value:
+                                graph.add((instance_uri, laderr_ns[prop], Literal(item)))
+                        else:
+                            graph.add((instance_uri, laderr_ns[prop], Literal(value)))
 
                 # Add the composedOf relationship
                 graph.add((specification_uri, laderr_ns.composedOf, instance_uri))
@@ -126,7 +128,7 @@ class Laderr:
             "createdBy": XSD.string,
             "createdOn": XSD.dateTime,
             "modifiedOn": XSD.dateTime,
-            "baseURI": XSD.anyURI,
+            "baseUri": XSD.anyURI,
         }
 
         # Validate base URI and bind namespaces
@@ -146,7 +148,7 @@ class Laderr:
         # Add spec_metadata_dict as properties of the specification
         for key, value in metadata.items():
             property_uri = laderr_ns[key]  # Schema properties come from laderr namespace
-            datatype = expected_datatypes.get(key, XSD.string)  # Default to xsd:string if not specified
+            datatype = expected_datatypes.get(key, XSD.anyURI)  # Default to xsd:string if not specified
 
             # Handle lists
             if isinstance(value, list):
@@ -171,15 +173,53 @@ class Laderr:
             - A graph with validation report.
         :rtype: Tuple[bool, str, Graph]
         """
-        shacl_graph = Graph()
-
-        shacl_file_path = "C:\\Users\\FavatoBarcelosPP\\Dev\\laderr\\shapes\\laderr-shape-laderrspecification-v0.3.1.shacl"
-        shacl_graph.parse(shacl_file_path, format="turtle")
+        shacl_files_path = "C:\\Users\\FavatoBarcelosPP\\Dev\\laderr\\shapes"
+        shacl_graph = Laderr._merge_shacl_files(shacl_files_path)
+        ic(len(shacl_graph))
 
         conforms, report_graph, report_text = validate(data_graph=data_graph, shacl_graph=shacl_graph, inference="both",
                                                        allow_infos=True, allow_warnings=True)
 
         return conforms, report_graph, report_text
+
+    @classmethod
+    def _merge_shacl_files(cls, shacl_files_path: str) -> Graph:
+        """
+        Merges all SHACL files in the given path into a single RDFLib graph.
+
+        :param shacl_files_path: The directory path containing SHACL files.
+        :type shacl_files_path: str
+        :return: A single RDFLib graph containing all merged SHACL shapes.
+        :rtype: Graph
+        :raises FileNotFoundError: If the directory or files are not found.
+        :raises ValueError: If the directory does not contain valid SHACL files.
+        """
+        # Initialize an empty RDFLib graph
+        merged_graph = Graph()
+
+        # Ensure the provided path is valid
+        if not os.path.isdir(shacl_files_path):
+            raise FileNotFoundError(f"The path '{shacl_files_path}' does not exist or is not a directory.")
+
+        # Iterate over all files in the directory
+        for filename in os.listdir(shacl_files_path):
+            ic(filename)
+            file_path = os.path.join(shacl_files_path, filename)
+
+            # Skip non-files
+            if not os.path.isfile(file_path):
+                continue
+
+            # Attempt to parse the SHACL file
+            try:
+                merged_graph.parse(file_path, format="turtle")
+            except Exception as e:
+                logger.warning(f"Failed to parse SHACL file '{filename}': {e}")
+
+        if len(merged_graph) == 0:
+            raise ValueError(f"No valid SHACL files found in the directory '{shacl_files_path}'.")
+
+        return merged_graph
 
     @classmethod
     def validate(cls, laderr_file_path: str):
@@ -195,14 +235,20 @@ class Laderr:
         unified_graph += spec_metadata_graph
         unified_graph += spec_data_graph
 
+        # Combine instances with Schema for correct SHACL evaluation
+        laderr_schema = Laderr._load_schema()
+        validation_graph = Graph()
+        validation_graph += unified_graph
+        validation_graph += laderr_schema
+
         # Bind namespaces in the unified graph
         base_uri = cls._validate_base_uri(spec_metadata_dict)
         unified_graph.bind("", Namespace(base_uri))  # Bind `:` to the base URI
         unified_graph.bind("laderr", cls.LADER_NS)  # Bind `laderr:` to the schema namespace
 
-        ic(len(spec_metadata_graph), len(spec_data_graph), len(unified_graph))
+        ic(len(spec_metadata_graph), len(spec_data_graph), len(unified_graph), len(laderr_schema), len(validation_graph))
 
-        conforms, _, report_text = Laderr._validate_with_shacl(unified_graph)
+        conforms, _, report_text = Laderr._validate_with_shacl(validation_graph)
         Laderr._report_validation_result(conforms, report_text)
         Laderr._save_graph(unified_graph, "./result.ttl")
         return conforms
@@ -218,7 +264,7 @@ class Laderr:
         :raises ValueError: If the file is not a valid RDF file or cannot be parsed.
         """
 
-        rdf_file_path = "C:\\Users\\FavatoBarcelosPP\\Dev\\laderr\\laderr-schema-v0.1.0.ttl"
+        rdf_file_path = "C:\\Users\\FavatoBarcelosPP\\Dev\\laderr\\laderr-schema-v0.2.0.ttl"
 
         # Initialize the graph
         graph = Graph()
