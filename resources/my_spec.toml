@@ -1,0 +1,21 @@
+# Metadata Section
+title = "Example LaDeRR Specification"
+description = "This is an example specification for LaDeRR."
+version = "1.0"
+createdBy = ["Alice", "Bob"]
+createdOn = "2025-01-17T12:00:00Z"
+modifiedOn = "2025-01-18T12:00:00Z"
+baseURI = "https://example123.com/laderr#"
+
+# Data Section
+[RiskEvent.a]
+name = "Test Risk Event"
+description = "A risk event example."
+
+[Object.b]
+id = "b1"
+name = "Test Object"
+description = "An object involved in the risk."
+
+[Disposition.c]
+description = "A disposition example."
