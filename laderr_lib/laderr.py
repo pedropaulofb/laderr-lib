@@ -1,7 +1,9 @@
 import os
 import tomllib
+from collections import defaultdict
 from urllib.parse import urlparse
 
+import toml
 from icecream import ic
 from loguru import logger
 from pyshacl import validate
@@ -79,8 +81,7 @@ class Laderr:
             for key, properties in instances.items():
                 if not isinstance(properties, dict):
                     raise ValueError(
-                        f"Invalid structure for instance '{key}' in '{class_type}'. Expected a dictionary of properties."
-                    )
+                        f"Invalid structure for instance '{key}' in '{class_type}'. Expected a dictionary of properties.")
 
                 # Determine the `id` of the instance (default to section key if not explicitly set)
                 instance_id = properties.get("id", key)
@@ -121,15 +122,8 @@ class Laderr:
         :rtype: Graph
         """
         # Define expected datatypes for spec_metadata_dict keys
-        expected_datatypes = {
-            "title": XSD.string,
-            "description": XSD.string,
-            "version": XSD.string,
-            "createdBy": XSD.string,
-            "createdOn": XSD.dateTime,
-            "modifiedOn": XSD.dateTime,
-            "baseUri": XSD.anyURI,
-        }
+        expected_datatypes = {"title": XSD.string, "description": XSD.string, "version": XSD.string,
+            "createdBy": XSD.string, "createdOn": XSD.dateTime, "modifiedOn": XSD.dateTime, "baseUri": XSD.anyURI, }
 
         # Validate base URI and bind namespaces
         base_uri = cls._validate_base_uri(metadata)
@@ -235,6 +229,8 @@ class Laderr:
         unified_graph += spec_metadata_graph
         unified_graph += spec_data_graph
 
+        Laderr._write_specification(spec_metadata_graph, spec_data_graph, "./testando.toml")
+
         # Combine instances with Schema for correct SHACL evaluation
         laderr_schema = Laderr._load_schema()
         validation_graph = Graph()
@@ -246,7 +242,8 @@ class Laderr:
         unified_graph.bind("", Namespace(base_uri))  # Bind `:` to the base URI
         unified_graph.bind("laderr", cls.LADER_NS)  # Bind `laderr:` to the schema namespace
 
-        ic(len(spec_metadata_graph), len(spec_data_graph), len(unified_graph), len(laderr_schema), len(validation_graph))
+        ic(len(spec_metadata_graph), len(spec_data_graph), len(unified_graph), len(laderr_schema),
+           len(validation_graph))
 
         conforms, _, report_text = Laderr._validate_with_shacl(validation_graph)
         Laderr._report_validation_result(conforms, report_text)
@@ -369,3 +366,67 @@ class Laderr:
 
         # Print the full textual validation report
         logger.info(f"\nFull Validation Report: {report_text}")
+
+    @classmethod
+    def _write_specification(cls, metadata_graph: Graph, data_graph: Graph, output_file: str) -> None:
+        """
+        Serializes the metadata and data graphs into TOML format and writes to a specified file.
+
+        :param metadata_graph: RDF graph containing metadata.
+        :type metadata_graph: Graph
+        :param data_graph: RDF graph containing data instances.
+        :type data_graph: Graph
+        :param output_file: Path to the output TOML file.
+        :type output_file: str
+        """
+        import toml
+        from collections import defaultdict
+
+        # Extract metadata from the metadata_graph
+        metadata = {}
+        for subject, predicate, obj in metadata_graph:
+            # Use simple predicate names, removing namespace
+            predicate_name = predicate.split("#")[-1]
+            if isinstance(obj, Literal):
+                value = obj.toPython()
+                if predicate_name in metadata:
+                    if not isinstance(metadata[predicate_name], list):
+                        metadata[predicate_name] = [metadata[predicate_name]]
+                    metadata[predicate_name].append(value)
+                else:
+                    metadata[predicate_name] = value
+
+        # Sort metadata by keys
+        sorted_metadata = dict(sorted(metadata.items()))
+
+        # Extract data instances from the data_graph
+        instances = defaultdict(lambda: defaultdict(dict))
+        for subject, predicate, obj in data_graph:
+            if subject != metadata_graph.value(predicate=RDF.type, object=cls.LADER_NS.LaderrSpecification):
+                instance_type = str(data_graph.value(subject=subject, predicate=RDF.type)).split("#")[-1]
+                instance_id = str(subject).split("#")[-1]
+                predicate_name = predicate.split("#")[-1]
+
+                if isinstance(obj, Literal):
+                    value = obj.toPython()
+                    if predicate_name in instances[instance_type][instance_id]:
+                        if not isinstance(instances[instance_type][instance_id][predicate_name], list):
+                            instances[instance_type][instance_id][predicate_name] = [
+                                instances[instance_type][instance_id][predicate_name]
+                            ]
+                        instances[instance_type][instance_id][predicate_name].append(value)
+                    else:
+                        instances[instance_type][instance_id][predicate_name] = value
+
+        # Combine metadata and instances into a TOML structure
+        toml_structure = {**sorted_metadata,
+                          **{instance_type: dict(instance_data) for instance_type, instance_data in instances.items()}}
+
+        # Write the TOML structure to the file
+        try:
+            with open(output_file, "w", encoding="utf-8") as file:
+                toml.dump(toml_structure, file)
+            logger.success(f"Specification serialized successfully to '{output_file}'.")
+        except Exception as e:
+            logger.error(f"Failed to serialize specification to TOML: {e}")
+            raise

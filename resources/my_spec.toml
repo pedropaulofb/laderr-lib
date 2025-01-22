@@ -3,8 +3,8 @@ title = "Example LaDeRR Specification"
 description = "This is an example specification for LaDeRR."
 version = "1.0"
 createdBy = ["Alice", "Bob"]
-createdOn = "2025-01-17T12:00:00Z"
-modifiedOn = "2025-01-18T12:00:00Z"
+createdOn = 2025-01-17T12:00:00Z
+modifiedOn = 2025-01-18T12:00:00Z
 baseUri = "https://example123.com/laderr#"
 
 # Data Section
